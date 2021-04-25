@@ -5,6 +5,12 @@ A plugin for running [Saxon][saxon] from [Gradle][gradle].
 
 ## A word about this fork
 
+[Updated by Norm on 25 April 2021]
+
+Ignore this. I was never able to figure out how to get it to publish
+correctly to Maven Central and @eerohele published a “beta2” of his
+plugin with my fix. Move along, nothing to see here.
+
 [Added by Norm on 24 April 2021]
 
 This fork fixes a bug where the plugin is too aggressive about parsing
