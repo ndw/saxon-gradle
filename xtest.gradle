@@ -1,0 +1,52 @@
+plugins {
+  id 'com.github.eerohele.saxon-gradle' version '0.9.0-beta1'
+}
+
+import com.github.eerohele.SaxonXsltTask
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  maven {
+    url "https://dev.saxonica.com/maven"
+  }
+}
+
+task first() {
+  outputs.file "build/identity.xsl"
+  doLast {
+    new File("build/identity.xsl").withWriter("utf-8") { writer ->
+      writer.writeLine("<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform'");
+      writer.writeLine("                xmlns:xs='http://www.w3.org/2001/XMLSchema'");
+      writer.writeLine("                exclude-result-prefixes='xs'");
+      writer.writeLine("                version='3.0'>");
+
+      writer.writeLine("<xsl:output method='xml' encoding='utf-8' indent='no'/>");
+
+      writer.writeLine("<xsl:template match='/'>");
+      writer.writeLine("  <xsl:apply-templates/>");
+      writer.writeLine("</xsl:template>");
+
+      writer.writeLine("<xsl:template match='element()'>");
+      writer.writeLine("  <xsl:copy>");
+      writer.writeLine("    <xsl:apply-templates select='@*,node()'/>");
+      writer.writeLine("  </xsl:copy>");
+      writer.writeLine("</xsl:template>");
+
+      writer.writeLine("<xsl:template match='attribute()|text()|comment()|processing-instruction()'>");
+      writer.writeLine("  <xsl:copy/>");
+      writer.writeLine("</xsl:template>");
+
+      writer.writeLine("</xsl:stylesheet>");
+    }
+  }
+}
+
+task second(type: SaxonXsltTask, dependsOn: ['first']) {
+  inputs.files first.outputs.files
+  outputs.file "build/copied.xml"
+
+  input "build/identity.xsl"
+  stylesheet first.outputs.files.singleFile
+  output "build/copied.xml"
+}
