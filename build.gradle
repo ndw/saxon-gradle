@@ -10,7 +10,7 @@ sourceCompatibility = 1.8
 dependencies {
     implementation gradleApi()
     implementation 'net.sf.saxon:Saxon-HE:10.5'
-    implementation 'org.xmlresolver:xmlresolver:2.0.0'
+    implementation 'org.xmlresolver:xmlresolver:2.1.0'
 
     testImplementation('org.spockframework:spock-core:2.0-M5-groovy-3.0') {
         exclude group: 'org.codehaus.groovy'
