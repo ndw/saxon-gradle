@@ -13,6 +13,7 @@ abstract class SaxonPluginExtension {
         cl()
     }
 }
+
 class SaxonPlugin implements Plugin<Project> {
     final String XSLT = 'xslt'
     final String SAXON = 'saxon'
