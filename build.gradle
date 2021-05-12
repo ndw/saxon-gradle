@@ -48,6 +48,12 @@ pluginBundle {
     vcsUrl = 'https://github.com/ndw/saxon-gradle.git'
     description = 'A Gradle plugin for running Saxon'
     tags = ['saxon', 'xslt', 'documentation']
+
+    mavenCoordinates {
+        groupId = project.group.toString()
+        artifactId = project.name
+        version = project.version.toString()
+    }
 }
 
 gradlePlugin {
