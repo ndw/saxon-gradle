@@ -24,6 +24,14 @@ trait SaxonPluginOptions {
         setPluginOption('outputDirectoryLayout', layout)
     }
 
+    void parallel(Boolean par) {
+        setPluginOption('parallel', par)
+    }
+
+    void debug(Boolean debug) {
+        setPluginOption('debug', debug)
+    }
+
     // ============================================================
 
     void config(Object config) {

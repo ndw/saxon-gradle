@@ -3,6 +3,7 @@ package com.nwalsh
 import org.xml.sax.InputSource
 import javax.xml.transform.sax.SAXSource
 
+import net.sf.saxon.Transform
 import net.sf.saxon.s9api.DocumentBuilder
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.QName
@@ -32,6 +33,8 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
     protected static final String INPUT_OPTION = 'input'
     protected static final String OUTPUT_OPTION = 'output'
     protected static final String STYLESHEET_OPTION = 'stylesheet'
+    protected static final String PARALLEL_OPTION = 'parallel'
+    protected static final String DEBUG_OPTION = 'debug'
 
     protected final List<String> defaultArguments = ['-quit:off'].asImmutable()
 
@@ -334,9 +337,19 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
 
     @TaskAction
     void run() {
-        WorkQueue workQueue = workerExecutor.classLoaderIsolation() {
-            if (getPluginOption('classpath') != null) {
-                it.getClasspath().from(getPluginOption('classpath'))
+        boolean parallel = false
+        if (getPluginOption(PARALLEL_OPTION) != null) {
+            parallel = getPluginOption(PARALLEL_OPTION)
+        }
+
+        Boolean debug = getPluginOption(DEBUG_OPTION)
+
+        WorkQueue workQueue = null
+        if (parallel) {
+            workQueue = workerExecutor.classLoaderIsolation() {
+                if (getPluginOption('classpath') != null) {
+                    it.getClasspath().from(getPluginOption('classpath'))
+                }
             }
         }
 
@@ -346,16 +359,42 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
             project.files(getOption(INPUT_OPTION)).each {
                 List<String> arguments = getFileSpecificArguments(it) + commonArguments
 
-                workQueue.submit(XsltTransformation) {
-                    it.arguments.set(arguments)
+                if (debug != null && debug) {
+                   String args = arguments.join(" ")
+                   if (parallel) {
+                       println("Parallel net.sf.saxon.Transform ${args}")
+                   } else {
+                       println("Running net.sf.saxon.Transform ${args}")
+                   }
+                }
+
+                if (parallel) {
+                    workQueue.submit(XsltTransformation) {
+                        it.arguments.set(arguments)
+                    }
+                } else {
+                    new Transform().doTransform(arguments as String[], '')
                 }
             }
         } else {
             String output = getOption(OUTPUT_OPTION).getPath()
             List<String> arguments = commonArguments + [makeSingleHyphenArgument(Argument.MAPPING.output, output)]
 
-            workQueue.submit(XsltTransformation) {
-                it.arguments.set(arguments)
+            if (debug != null && debug) {
+               String args = arguments.join(" ")
+               if (parallel) {
+                   println("Parallel net.sf.saxon.Transform ${args}")
+               } else {
+                   println("Running net.sf.saxon.Transform ${args}")
+               }
+            }
+
+            if (parallel) {
+                workQueue.submit(XsltTransformation) {
+                    it.arguments.set(arguments)
+                }
+            } else {
+                new Transform().doTransform(arguments as String[], '')
             }
         }
     }

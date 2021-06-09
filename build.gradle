@@ -25,7 +25,7 @@ repositories {
 }
 
 group = 'com.nwalsh'
-version = '0.9.1-beta3'
+version = '0.9.1-beta4'
 
 test {
     testLogging {
