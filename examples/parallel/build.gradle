@@ -1,17 +1,8 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'xml-resolver:xml-resolver:1.2'
-    }
-}
-
 plugins {
     // This is a dummy version number — use the actual latest version number
     // instead.
-    id 'com.nwalsh.gradle.saxon.saxon-gradle' version '1.0-SNAPSHOT'
+    // id 'com.github.eerohele.saxon-gradle' version '1.0-SNAPSHOT'
+    id 'com.nwalsh.saxon-gradle' version '0.9.1-beta4'
 }
 
 defaultTasks 'xslt'
@@ -27,9 +18,4 @@ xslt {
         title: 'Purchase Order',
         padding: '0.625rem'
     )
-
-    // Set Saxon configuration file
-    config 'config/configuration.xml'
-
-    catalog 'catalog.xml'
 }

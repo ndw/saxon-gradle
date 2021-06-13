@@ -1,7 +1,7 @@
 // See the 'simple' example for explanations of some of the common options.
 
 plugins {
-    id 'com.github.eerohele.saxon-gradle' version '1.0-SNAPSHOT'
+    id 'com.nwalsh.gradle.saxon.saxon-gradle' version '1.0-SNAPSHOT'
 }
 
 defaultTasks 'xslt'

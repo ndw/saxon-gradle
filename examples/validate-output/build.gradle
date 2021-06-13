@@ -1,5 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'xml-resolver:xml-resolver:1.2'
+    }
+}
+
 plugins {
-    id 'com.github.eerohele.saxon-gradle' version '1.0-SNAPSHOT'
+    id 'com.nwalsh.gradle.saxon.saxon-gradle' version '1.0-SNAPSHOT'
 }
 
 defaultTasks 'xslt'
