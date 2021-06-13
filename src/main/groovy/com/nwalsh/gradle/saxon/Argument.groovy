@@ -1,4 +1,4 @@
-package com.nwalsh
+package com.nwalsh.gradle.saxon
 
 import java.lang.reflect.Modifier
 

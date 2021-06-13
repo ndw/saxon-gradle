@@ -1,4 +1,4 @@
-package com.nwalsh
+package com.nwalsh.gradle.saxon
 
 import org.xml.sax.InputSource
 import javax.xml.transform.sax.SAXSource
@@ -42,7 +42,7 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
     protected final Map<String, String> advancedOptions = [:]
     protected final Map<String, Object> pluginOptions = [outputDirectoryLayout: 'flat']
 
-    protected String pluginConfig = SaxonPluginConfigurations.DEFAULT
+    protected String pluginConfig = SaxonPluginExtension.DEFAULT
     protected Map<String, String> stylesheetParams = [:]
 
     private final Processor processor
@@ -96,23 +96,23 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
 
     Object getOption(String name) {
         return name in options ? options[name] :
-            SaxonPluginConfigurations.instance.getOptions(pluginConfig)[name]
+            project.saxon.getOptions(pluginConfig)[name]
     }
 
     Object getAdvancedOption(String name) {
         return name in advancedOptions ? advancedOptions[name] :
-            SaxonPluginConfigurations.instance.getAdvancedOptions(pluginConfig)[name]
+            project.saxon.getAdvancedOptions(pluginConfig)[name]
     }
 
     Object getPluginOption(String name) {
         return name in pluginOptions ? pluginOptions[name] :
-            SaxonPluginConfigurations.instance.getPluginOptions(pluginConfig)[name]
+            project.saxon.getPluginOptions(pluginConfig)[name]
     }
 
     // ============================================================
 
     void pluginConfiguration(String name) {
-        if (SaxonPluginConfigurations.instance.knownConfiguration(name)) {
+        if (name in projet.xslt.configurations()) {
             pluginConfig = name
         } else {
             throw new InvalidUserDataException("Unknown SaxonXsltTask plugin configuration: ${name}")
@@ -297,16 +297,16 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
     @Internal
     protected List<String> getCommonArguments() {
         Map<String, String> commonOptions = [:]
-        SaxonPluginConfigurations.instance.getOptions(pluginConfig).findAll { name, value ->
+        project.saxon.getOptions(pluginConfig).each { name, value ->
             commonOptions[name] = value
         }
-        this.options.findAll { name, value ->
+        this.options.each { name, value ->
             if (name != INPUT_OPTION && name != OUTPUT_OPTION) {
                 commonOptions[name] = value
             }
         }
 
-        SaxonPluginConfigurations.instance.getAdvancedOptions(pluginConfig).findAll { name, value ->
+        project.saxon.getAdvancedOptions(pluginConfig).each { name, value ->
             advancedOptions[name] = value
         }
         this.advancedOptions.findAll { name, value ->

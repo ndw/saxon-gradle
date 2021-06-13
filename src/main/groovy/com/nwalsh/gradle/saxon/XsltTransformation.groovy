@@ -1,4 +1,4 @@
-package com.nwalsh
+package com.nwalsh.gradle.saxon
 
 import net.sf.saxon.Transform
 import org.gradle.workers.WorkAction

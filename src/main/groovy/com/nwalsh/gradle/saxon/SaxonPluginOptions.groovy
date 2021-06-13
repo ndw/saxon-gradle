@@ -1,4 +1,4 @@
-package com.nwalsh
+package com.nwalsh.gradle.saxon
 
 // This trait is for initializing options and advanced options.
 // It's used by both the global configuration singleton and
