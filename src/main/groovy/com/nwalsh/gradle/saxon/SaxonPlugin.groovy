@@ -8,7 +8,7 @@ abstract class SaxonPluginExtension {
     private Map<String,SaxonPluginConfiguration> configs = new HashMap<>()
 
     void configure(Closure cl) {
-        this.configure(SaxonPluginConfigurations.DEFAULT, cl)
+        this.configure(DEFAULT, cl)
     }
     
     void configure(String name, Closure cl) {
