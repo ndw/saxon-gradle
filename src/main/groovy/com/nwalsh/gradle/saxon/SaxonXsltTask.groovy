@@ -351,6 +351,10 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
                     it.getClasspath().from(getPluginOption('classpath'))
                 }
             }
+        } else {
+            if (getPluginOption('classpath') != null) {
+                logger.warn("Setting 'classpath' has no effect unless parallel execution is enabled.")
+            }
         }
 
         List<String> commonArguments = getCommonArguments() + getStylesheetParameters()
@@ -373,7 +377,7 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
                         it.arguments.set(arguments)
                     }
                 } else {
-                    new Transform().doTransform(arguments as String[], '')
+                    SaxonTranform.doTransform(arguments as String[])
                 }
             }
         } else {
@@ -394,7 +398,7 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
                     it.arguments.set(arguments)
                 }
             } else {
-                new Transform().doTransform(arguments as String[], '')
+                SaxonTranform.doTransform(arguments as String[])
             }
         }
     }
