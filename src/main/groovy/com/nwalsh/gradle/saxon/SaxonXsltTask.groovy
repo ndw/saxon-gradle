@@ -112,7 +112,7 @@ class SaxonXsltTask extends DefaultTask implements SaxonPluginOptions {
     // ============================================================
 
     void pluginConfiguration(String name) {
-        if (name in projet.xslt.configurations()) {
+        if (name in project.xslt.configurations()) {
             pluginConfig = name
         } else {
             throw new InvalidUserDataException("Unknown SaxonXsltTask plugin configuration: ${name}")
