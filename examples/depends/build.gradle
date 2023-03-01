@@ -25,6 +25,8 @@ wrapper {
 }
 
 task xslt(type: SaxonXsltTask) {
+  debug true
+  xmlDepends true
   stylesheet 'tools/html5.xsl'
   input 'xml/input-1.xml'
   output 'build/output-1.xml'
@@ -35,6 +37,8 @@ task xslt(type: SaxonXsltTask) {
 }
 
 task xquery(type: SaxonXQueryTask) {
+  debug false
+  xmlDepends true
   query 'tools/query.xq'
   input 'xml/input-1.xml'
   output "${buildDir}/output-2.xml"

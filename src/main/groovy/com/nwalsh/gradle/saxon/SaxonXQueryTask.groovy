@@ -10,16 +10,20 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 
 /**
- * The SaxonXsltTask runs an XSLT transformation.
+ * The SaxonXQueryTask runs an XQuery transformation.
  *
  * <p>The task interface and the implementation are separated in order to "hide" utility
  * methods from the task closure. It seems like there should be a better way, but I wasn't
  * able to find it.</p>
  */
-class SaxonXsltTask extends DefaultTask implements SaxonXslt {
-  private final SaxonXsltImpl impl = new SaxonXsltImpl(this)
+class SaxonXQueryTask extends DefaultTask implements SaxonXQuery {
+  private final SaxonXQueryImpl impl = new SaxonXQueryImpl(this)
   protected List<String> cachedXml = null
-  protected List<String> cachedXsl = null
+
+  SaxonXQueryTask() {
+    impl.mainClassName = 'net.sf.saxon.Query'
+    impl.taskType = 'XQuery'
+  }
 
   void javaArg(String arg) {
     impl.javaArg(arg)
@@ -81,12 +85,12 @@ class SaxonXsltTask extends DefaultTask implements SaxonXslt {
     impl.baseURI(uri)
   }
 
-  void stylesheet(Object stylesheet) {
-    impl.stylesheet(stylesheet)
+  void query(Object xq) {
+    impl.query(xq)
   }
 
-  void xslDepends(Object depends) {
-    impl.xslDepends(depends)
+  void queryString(String xq) {
+    impl.queryString(xq)
   }
 
   @InputFiles
@@ -94,9 +98,8 @@ class SaxonXsltTask extends DefaultTask implements SaxonXslt {
   FileCollection getInputFiles() {
     FileCollection files = project.files()
     Object input = impl.getInput()
-    Object stylesheet = impl.getStylesheet()
+    Object query = impl.getQueryFile()
     Object xmlDepends = impl.getXmlDepends()
-    Object xslDepends = impl.getXslDepends()
 
     // This method is called twice; we cache the results to avoid doing the work twice
 
@@ -111,17 +114,10 @@ class SaxonXsltTask extends DefaultTask implements SaxonXslt {
       }
     }
 
-    if (stylesheet instanceof File) {
-      if (xslDepends != null && !(xslDepends instanceof Boolean && !xslDepends)) {
-        if (cachedXsl == null) {
-          cachedXsl = impl.xslDependsOn("${stylesheet}")
-        }
-        files += project.files(cachedXsl as String[])
-      } else {
-        files += project.files(stylesheet)
-      }
+    if (query instanceof File) {
+      files += project.files(query)
     }
-
+    
     return files
   }
 
@@ -139,6 +135,5 @@ class SaxonXsltTask extends DefaultTask implements SaxonXslt {
   void run() {
     impl.run()
     cachedXml = null
-    cachedXsl = null
   }
 }

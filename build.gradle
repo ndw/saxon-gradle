@@ -1,68 +1,47 @@
 plugins {
-    id 'groovy'
-    id 'codenarc'
-    id 'java-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '0.14.0'
+  id 'groovy'
+  id 'codenarc'
+  id 'java-gradle-plugin'
+  id 'com.gradle.plugin-publish' version '1.1.0'
 }
 
-sourceCompatibility = 1.8
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+wrapper {
+  gradleVersion = '8.0'
+}
 
 dependencies {
-    implementation gradleApi()
-    implementation 'net.sf.saxon:Saxon-HE:11.2'
-    implementation 'org.xmlresolver:xmlresolver:2.1.0'
-
-    testImplementation('org.spockframework:spock-core:2.0-M5-groovy-3.0') {
-        exclude group: 'org.codehaus.groovy'
-    }
-
-    testImplementation gradleTestKit()
-    testImplementation 'junit:junit:4.12'
+  implementation gradleApi()
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 test {
-    testLogging {
-        showStandardStreams = true
-        exceptionFormat = 'full'
-    }
-}
-
-wrapper {
-    gradleVersion = '7.0'
+  testLogging {
+    showStandardStreams = true
+    exceptionFormat = 'full'
+  }
 }
 
 codenarc {
-    toolVersion = '2.1.0'
+    toolVersion = '3.2.0'
     configFile = file('config/codenarc/codenarc.groovy')
 }
 
-pluginBundle {
-    website = 'https://github.com/ndw/saxon-gradle'
-    vcsUrl = 'https://github.com/ndw/saxon-gradle.git'
-    description = 'A Gradle plugin for running Saxon'
-    tags = ['saxon', 'xslt', 'documentation']
-
-    mavenCoordinates {
-        groupId = project.group.toString()
-        artifactId = project.name
-        version = project.version.toString()
-    }
-}
-
 gradlePlugin {
-    plugins {
-        SaxonPlugin {
-            id = 'com.nwalsh.gradle.saxon.saxon-gradle'
-            displayName = 'Saxon Gradle Plugin'
-            implementationClass = 'com.nwalsh.gradle.saxon.SaxonPlugin'
-            description = 'A Gradle plugin for running XSLT transformations with Saxon'
-        }
+  website = 'https://github.com/ndw/saxon-gradle'
+  vcsUrl = 'https://github.com/ndw/saxon-gradle.git'
+  plugins {
+    SaxonPlugin {
+      id = 'com.nwalsh.gradle.saxon.saxon-gradle'
+      implementationClass = 'com.nwalsh.gradle.saxon.SaxonPlugin'
+      displayName = 'Saxon Gradle Plugin'
+      description = 'A Gradle plugin for running XSLT transformations with Saxon'
+      tags.set(['saxon', 'xslt', 'documentation'])
     }
+  }
 }
-
-// I can't figure out how to get test to pass...
-//publishPlugins.dependsOn check
