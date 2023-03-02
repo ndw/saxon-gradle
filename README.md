@@ -38,17 +38,20 @@ Eero’s plugin is also capable of processing entire directories of XML
 documents with multiple threads. That added a fair bit of complexity
 and it’s just something I’ve never wanted to do. So I removed it.
 
-I did, add a few things:
+I did add a few things:
 
-1. It’s no possible to run XQuery transformations in addition to XSLT
+1. It’s now possible to run XQuery transformations in addition to XSLT
    transformations.
 2. It’s possible to request that the transformation be performed in a
    separate Java process. This means you can run transforms with
-   different Java properties, environment variabes, or classpaths.
+   different Java properties or environment variables, or with a different classpath.
 3. The process for examining XML documents and stylesheets to work out
    if they have additional dependencies has been ported to stylesheets
-   that you could choose to replace if you had more specific
-   requirements.
+   that you can override if you have more specific requirements. Note
+   that Gradle does this during the *configuration* phase, so it will
+   happen for every task that uses the feature, on every run,
+   irrespective of what tasks actually get run. Useful, but perhaps
+   best used sparingly.
 
 ## Example
 
