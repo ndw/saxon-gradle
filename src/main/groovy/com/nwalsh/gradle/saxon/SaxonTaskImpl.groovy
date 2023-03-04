@@ -12,6 +12,7 @@ import org.gradle.api.GradleException
 class SaxonTaskImpl {
   protected static final String QUIT = '-quit:off'
   protected static final String SPACE = ' '
+  protected static final String FILE_SCHEME = 'file'
 
   protected final List<String> javaOptions = []
   protected final List<String> saxonOptions = []
@@ -217,11 +218,11 @@ class SaxonTaskImpl {
         return uri
       }
     } catch (URISyntaxException ex) {
-      // nop
+      uri = null // Irrelevant, but make codenarc happy
     }
 
     URI uri = theBaseURI.resolve("${input}");
-    if (uri.getScheme() == "file") {
+    if (uri.getScheme() == FILE_SCHEME) {
       return new File(uri.getPath())
     }
 
@@ -234,7 +235,7 @@ class SaxonTaskImpl {
     }
 
     if (input instanceof URI) {
-      if (input.getScheme() == "file") {
+      if (input.getScheme() == FILE_SCHEME) {
         return new File(input)
       }
     }
