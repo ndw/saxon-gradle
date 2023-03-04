@@ -96,26 +96,27 @@ class SaxonXQueryTask extends DefaultTask implements SaxonXQuery {
   @InputFiles
   @SkipWhenEmpty
   FileCollection getInputFiles() {
-    FileCollection files = project.files()
-    Object input = impl.getInput()
-    Object query = impl.getQueryFile()
+    FileCollection files = project.files([])
     Object xmlDepends = impl.getXmlDepends()
+    File inputFile = null
 
     // This method is called twice; we cache the results to avoid doing the work twice
 
-    if (input instanceof File) {
+    inputFile = impl.resolveFile(impl.getInput())
+    if (inputFile instanceof File) {
       if (xmlDepends != null && !(xmlDepends instanceof Boolean && !xmlDepends)) {
         if (cachedXml == null) {
-          cachedXml = impl.xmlDependsOn("${input}")
+          cachedXml = impl.xmlDependsOn("${inputFile}")
         }
         files += project.files(cachedXml as String[])
       } else {
-        files += project.files(input)
+        files += project.files(inputFile)
       }
     }
 
-    if (query instanceof File) {
-      files += project.files(query)
+    inputFile = impl.resolveFile(impl.getQueryFile())
+    if (inputFile instanceof File) {
+      files += project.files(inputFile)
     }
     
     return files
@@ -124,11 +125,12 @@ class SaxonXQueryTask extends DefaultTask implements SaxonXQuery {
   @OutputFiles
   @Optional
   FileCollection getOutputFiles() {
-    if (impl.getOutput() instanceof File) {
-      project.files(impl.getOutput())
-    } else {
-      null
+    FileCollection files = project.files([])
+    File outputFile = impl.resolveFile(impl.getOutput())
+    if (outputFile != null) {
+      files += project.files(outputFile)
     }
+    return files
   }
 
   @TaskAction

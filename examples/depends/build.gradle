@@ -27,6 +27,7 @@ wrapper {
 task xslt(type: SaxonXsltTask) {
   debug true
   xmlDepends true
+  xslDepends true
   stylesheet 'tools/html5.xsl'
   input 'xml/input-1.xml'
   output 'build/output-1.xml'

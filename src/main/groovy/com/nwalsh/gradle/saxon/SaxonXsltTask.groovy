@@ -92,33 +92,34 @@ class SaxonXsltTask extends DefaultTask implements SaxonXslt {
   @InputFiles
   @SkipWhenEmpty
   FileCollection getInputFiles() {
-    FileCollection files = project.files()
-    Object input = impl.getInput()
-    Object stylesheet = impl.getStylesheet()
+    FileCollection files = project.files([])
     Object xmlDepends = impl.getXmlDepends()
     Object xslDepends = impl.getXslDepends()
+    File inputFile = null
 
     // This method is called twice; we cache the results to avoid doing the work twice
 
-    if (input instanceof File) {
+    inputFile = impl.resolveFile(impl.getInput())
+    if (inputFile != null) {
       if (xmlDepends != null && !(xmlDepends instanceof Boolean && !xmlDepends)) {
         if (cachedXml == null) {
-          cachedXml = impl.xmlDependsOn("${input}")
+          cachedXml = impl.xmlDependsOn("${inputFile}")
         }
         files += project.files(cachedXml as String[])
       } else {
-        files += project.files(input)
+        files += project.files(inputFile)
       }
     }
 
-    if (stylesheet instanceof File) {
+    inputFile = impl.resolveFile(impl.getStylesheet())
+    if (inputFile != null) {
       if (xslDepends != null && !(xslDepends instanceof Boolean && !xslDepends)) {
         if (cachedXsl == null) {
-          cachedXsl = impl.xslDependsOn("${stylesheet}")
+          cachedXsl = impl.xslDependsOn("${inputFile}")
         }
         files += project.files(cachedXsl as String[])
       } else {
-        files += project.files(stylesheet)
+        files += project.files(inputFile)
       }
     }
 
@@ -128,11 +129,12 @@ class SaxonXsltTask extends DefaultTask implements SaxonXslt {
   @OutputFiles
   @Optional
   FileCollection getOutputFiles() {
-    if (impl.getOutput() instanceof File) {
-      project.files(impl.getOutput())
-    } else {
-      null
+    FileCollection files = project.files([])
+    File outputFile = impl.resolveFile(impl.getOutput())
+    if (outputFile != null) {
+      files += project.files(outputFile)
     }
+    return files
   }
 
   @TaskAction
