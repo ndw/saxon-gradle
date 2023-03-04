@@ -202,11 +202,22 @@ class SaxonTaskImpl {
     if (input == null) {
       return null
     }
+
     if (input instanceof File) {
       return input
     }
+
     if (input instanceof URI) {
       return input
+    }
+
+    try {
+      URI uri = new URI(input)
+      if (uri.isAbsolute()) {
+        return uri
+      }
+    } catch (URISyntaxException ex) {
+      // nop
     }
 
     URI uri = theBaseURI.resolve("${input}");
@@ -215,6 +226,20 @@ class SaxonTaskImpl {
     }
 
     return uri
+  }
+
+  protected File resolveFile(Object input) {
+    if (input instanceof File) {
+      return input
+    }
+
+    if (input instanceof URI) {
+      if (input.getScheme() == "file") {
+        return new File(input)
+      }
+    }
+
+    return null
   }
 
   // ============================================================
