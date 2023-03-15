@@ -212,8 +212,9 @@ class SaxonTaskImpl {
       return input
     }
 
+    URI uri;
     try {
-      URI uri = new URI(input)
+      uri = new URI(input)
       if (uri.isAbsolute()) {
         return uri
       }
@@ -221,7 +222,7 @@ class SaxonTaskImpl {
       uri = null // Irrelevant, but make codenarc happy
     }
 
-    URI uri = theBaseURI.resolve("${input}");
+    uri = theBaseURI.resolve("${input}");
     if (uri.getScheme() == FILE_SCHEME) {
       return new File(uri.getPath())
     }
