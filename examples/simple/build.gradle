@@ -28,7 +28,7 @@ task xslt(type: SaxonXsltTask) {
   // Use URIs, just to show a simple arg
   stylesheet "file://${projectDir}/tools/html5.xsl"
   input "file://${projectDir}/xml/input-1.xml"
-  output "file:///${buildDir}/output-1.xml"
+  output "file://${buildDir}/output-1.xml"
   arg '-u'
   parameters([
     "title": "spoon",
