@@ -1,18 +1,33 @@
 package com.nwalsh.gradle.saxon
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.TaskExecutionException
 import org.gradle.api.GradleException
 
+import org.gradle.internal.os.OperatingSystem;
+
 /**
  * The bulk of the actual implementation. This is the base class for the
  * SaxonXsltImpl and SaxonXQueryImpl classes.
  */
+@SuppressWarnings('MethodCount')
 class SaxonTaskImpl {
   protected static final String QUIT = '-quit:off'
   protected static final String SPACE = ' '
+  protected static final String SLASH = '/'
   protected static final String FILE_SCHEME = 'file'
+  protected static final String USE_URIS_OPTION = '-u'
+
+  protected static final String CWD = System.getProperty("user.dir")
+  protected static final Boolean IS_WINDOWS = OperatingSystem.current().isWindows()
+  protected static final Pattern WINDOWS_BROKEN_FILE_URI
+    = Pattern.compile('^file://([A-Za-z]:.*)$')
+  protected static final Pattern WINDOWS_FILENAME
+    = Pattern.compile('^[A-Za-z]:.*$')
 
   protected final List<String> javaOptions = []
   protected final List<String> saxonOptions = []
@@ -30,6 +45,7 @@ class SaxonTaskImpl {
   protected Object stylesheetFile = null
   protected Object xqueryFile = null
   protected Object xqueryString = null
+  protected Boolean useURIs = false
   protected final Map<String,String> stylesheetParameters = [:]
 
   protected final Map<String,String> javaEnv = [:]
@@ -43,9 +59,14 @@ class SaxonTaskImpl {
   }
 
   protected SaxonTaskImpl(DefaultTask task) {
+    this(task, false)
+  }
+
+  protected SaxonTaskImpl(DefaultTask task, Boolean isXQuery) {
     this.task = task
-    File cwd = new File(System.getProperty("user.dir"))
+    File cwd = new File(CWD)
     theBaseURI = cwd.toURI()
+    useURIs = IS_WINDOWS && !isXQuery;
   }
 
   // ============================================================
@@ -124,7 +145,15 @@ class SaxonTaskImpl {
   }
 
   void output(Object output) {
-    this.outputFile = resolveResource(output)
+    outputFile = resolveResource(output)
+    // The output must be a File, not a URI
+    if (outputFile instanceof URI) {
+      if (outputFile.getScheme() == FILE_SCHEME) {
+        outputFile = new File(outputFile.getPath())
+      } else {
+        throw new GradleException("Output must be a file.")
+      }
+    }
     show("Out: ${this.output}")
   }
 
@@ -209,24 +238,39 @@ class SaxonTaskImpl {
     }
 
     if (input instanceof URI) {
+      useURIs = true
       return input
+    }
+
+    String path = input.toString()
+    if (IS_WINDOWS) {
+      path = fixWindowsPath(path)
+      Matcher match = WINDOWS_BROKEN_FILE_URI.matcher(path)
+      if (match.find()) {
+        path = makeFileURI(match.group(1))
+      } else {
+        match = WINDOWS_FILENAME.matcher(path)
+        if (match.find()) {
+          path = makeFileURI(path)
+        }
+      }
     }
 
     URI uri;
     try {
-      uri = new URI(input)
-      if (uri.isAbsolute()) {
-        return uri
+      uri = new URI(path)
+      if (!uri.isAbsolute()) {
+        uri = theBaseURI.resolve(path);
       }
     } catch (URISyntaxException ex) {
-      uri = null // Irrelevant, but make codenarc happy
+      uri = theBaseURI.resolve(path);      
     }
 
-    uri = theBaseURI.resolve("${input}");
     if (uri.getScheme() == FILE_SCHEME) {
       return new File(uri.getPath())
     }
 
+    useURIs = true
     return uri
   }
 
@@ -253,22 +297,32 @@ class SaxonTaskImpl {
     if (inputFile != null) {
       String inputName = input.toString()
       if (inputName.endsWith('.json') or inputName.endsWith('.js')) {
-        parameters.add("-json:${input}")
+        parameters.add("-json:${fileRef(inputFile)}")
       } else {
-        parameters.add("-s:${input}")
+        parameters.add("-s:${fileRef(inputFile)}")
       }
     }
     if (stylesheetFile != null) {
-      parameters.add("-xsl:${stylesheetFile}")
+      parameters.add("-xsl:${fileRef(stylesheetFile)}")
     }
     if (xqueryFile != null) {
-      parameters.add("-q:${xqueryFile}")
+      parameters.add("-q:${fileRef(xqueryFile)}")
     }
     if (xqueryString != null) {
       parameters.add("-qs:${xqueryString}")
     }
     if (outputFile != null) {
       parameters.add("-o:${output}")
+    }
+
+    if (useURIs) {
+      Boolean hasU = false
+      saxonOptions.each { opt ->
+        hasU = hasU || opt == USE_URIS_OPTION
+      }
+      if (!hasU) {
+        parameters.add(USE_URIS_OPTION)
+      }
     }
 
     stylesheetParameters.collect { name, value ->
@@ -278,8 +332,64 @@ class SaxonTaskImpl {
     return parameters
   }
 
+  @SuppressWarnings('DuplicateNumberLiteral')
+  protected String fileRef(Object fn) {
+    if (fn == null) {
+      return "null";
+    }
+
+    String path = fn.toString()
+
+    // On most systems, you can just use the filename as the, you know,
+    // name of the file. But on Windows, we have to make it an explicit
+    // file:/// URI because java.net.URI rejects C:\path as having an
+    // "illegal character in opaque part" and file:///C:\path as having
+    // an "illegal character in path".
+    if (IS_WINDOWS) {
+      path = fixWindowsPath(path)
+      Matcher match = WINDOWS_FILENAME.matcher(path)
+      if (match.find()) {
+        // Attempt to work around https://saxonica.plan.io/issues/5939
+        String cwd = fixWindowsPath(CWD)
+        if (!useURIs && cwd.substring(0,3) == path.substring(0,3)) {
+          return path.substring(2)
+        }
+        useURIs = true
+        return makeFileURI(path)
+      }
+    }
+
+    return path
+  }
+
+  private String fixWindowsPath(String path) {
+    return path.replace("\\", SLASH).replace("+", "%2B").replace(SPACE, "%20")
+  }
+
+  private String makeFileURI(String path) {
+    return "file:///" + path
+  }
+
+  private String getFilePath(URI uri) {
+    if (uri.getScheme() != FILE_SCHEME) {
+      return null
+    }
+    String path = uri.getPath()
+    if (IS_WINDOWS && path.startsWith(SLASH)) {
+      String filepart = path.substring(1)
+      Matcher match = WINDOWS_FILENAME.matcher(filepart)
+      if (match.find()) {
+        return filepart;
+      }
+    }
+    return path
+  }
+
   @SuppressWarnings('CatchException')
-  private List<String> findDependsOn(String prefix, Object dependSetting, String defaultStylesheet, String sourceFile) {
+  private List<String> findDependsOn(String prefix,
+                                     Object dependSetting,
+                                     String defaultStylesheet,
+                                     String sourceFile) {
     def dependencies = new ArrayList<String>()
 
     if (dependSetting instanceof Boolean && !dependSetting) {
@@ -318,9 +428,12 @@ class SaxonTaskImpl {
 
       BufferedInputStream uris = new BufferedInputStream(new FileInputStream(urilist))
       for (line in uris.readLines()) {
-        URI uri = new URI(line)
-        dependencies.add(uri.getPath())
+        String path = getFilePath(new URI(line))
+        if (path != null) {
+          dependencies.add(path)
+        }
       }
+
     } catch (Exception ex) {
       show("Failed to read dependencies from ${sourceFile}: ${ex.getMessage()}")
       dependencies.add(sourceFile)
