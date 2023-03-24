@@ -288,6 +288,8 @@ class SaxonTaskImpl {
     def parameters = []
     parameters.addAll(saxonOptions)
 
+    println("DEBUG: ${CWD}")
+
     if (inputFile != null) {
       String inputName = input.toString()
       if (inputName.endsWith('.json') or inputName.endsWith('.js')) {
