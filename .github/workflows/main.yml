@@ -33,4 +33,4 @@ jobs:
     - name: Test depends
       working-directory: examples/depends
       run: |
-        ./gradlew xslt xquery
+        ./gradlew --console plain xslt xquery --stacktrace
