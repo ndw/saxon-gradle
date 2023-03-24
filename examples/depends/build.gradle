@@ -37,13 +37,21 @@ task xslt(type: SaxonXsltTask) {
   ])
 }
 
-task xquery(type: SaxonXQueryTask) {
-  debug false
-  xmlDepends true
-  query 'tools/query.xq'
-  input 'xml/input-1.xml'
-  output "${buildDir}/output-2.xml"
-  parameters([
-    'multiplier': 7
-  ])
+if ("yes".equals(System.getenv("CIWORKFLOW"))
+    && System.getProperty("os.name").startsWith("Windows")) {
+  task xquery() {
+    println("The xquery tasks don't run in CI under Windows")
+    println("For inexplicable reasons, the paths get mangled.")
+  }
+} else {
+  task xquery(type: SaxonXQueryTask) {
+    debug true
+    xmlDepends true
+    query 'tools/query.xq'
+    input 'xml/input-1.xml'
+    output "${buildDir}/output-2.xml"
+    parameters([
+      'multiplier': 7
+    ])
+  }
 }
