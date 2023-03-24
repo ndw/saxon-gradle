@@ -415,6 +415,8 @@ class SaxonTaskImpl {
         depends = new File((String) dependSetting)
       }
 
+      println("Transform: ${sourceFile}, ${depends}, ${urilist}")
+
       invoke("net.sf.saxon.Transform",
               [QUIT,
                "-s:${sourceFile}",
@@ -428,6 +430,9 @@ class SaxonTaskImpl {
           dependencies.add(path)
         }
       }
+
+      println("//Transform")
+
     } catch (Exception ex) {
       show("Failed to read dependencies from ${sourceFile}: ${ex.getMessage()}")
       dependencies.add(sourceFile)
