@@ -18,6 +18,7 @@ import org.gradle.internal.os.OperatingSystem;
 class SaxonTaskImpl {
   protected static final String QUIT = '-quit:off'
   protected static final String SPACE = ' '
+  protected static final String SLASH = '/'
   protected static final String FILE_SCHEME = 'file'
   protected static final String USE_URIS_OPTION = '-u'
 
@@ -58,9 +59,14 @@ class SaxonTaskImpl {
   }
 
   protected SaxonTaskImpl(DefaultTask task) {
+    this(task, false)
+  }
+
+  protected SaxonTaskImpl(DefaultTask task, Boolean isXQuery) {
     this.task = task
     File cwd = new File(CWD)
     theBaseURI = cwd.toURI()
+    useURIs = IS_WINDOWS && !isXQuery;
   }
 
   // ============================================================
@@ -345,7 +351,7 @@ class SaxonTaskImpl {
       if (match.find()) {
         // Attempt to work around https://saxonica.plan.io/issues/5939
         String cwd = fixWindowsPath(CWD)
-        if (cwd.substring(0,3) == path.substring(0,3)) {
+        if (!useURIs && cwd.substring(0,3) == path.substring(0,3)) {
           return path.substring(2)
         }
         useURIs = true
@@ -357,15 +363,33 @@ class SaxonTaskImpl {
   }
 
   private String fixWindowsPath(String path) {
-    return path.replace("\\", "/").replace("+", "%2B").replace(SPACE, "%20")
+    return path.replace("\\", SLASH).replace("+", "%2B").replace(SPACE, "%20")
   }
 
   private String makeFileURI(String path) {
     return "file:///" + path
   }
 
+  private String getFilePath(URI uri) {
+    if (uri.getScheme() != FILE_SCHEME) {
+      return null
+    }
+    String path = uri.getPath()
+    if (IS_WINDOWS && path.startsWith(SLASH)) {
+      String filepart = path.substring(1)
+      Matcher match = WINDOWS_FILENAME.matcher(filepart)
+      if (match.find()) {
+        return filepart;
+      }
+    }
+    return path
+  }
+
   @SuppressWarnings('CatchException')
-  private List<String> findDependsOn(String prefix, Object dependSetting, String defaultStylesheet, String sourceFile) {
+  private List<String> findDependsOn(String prefix,
+                                     Object dependSetting,
+                                     String defaultStylesheet,
+                                     String sourceFile) {
     def dependencies = new ArrayList<String>()
 
     if (dependSetting instanceof Boolean && !dependSetting) {
@@ -404,9 +428,12 @@ class SaxonTaskImpl {
 
       BufferedInputStream uris = new BufferedInputStream(new FileInputStream(urilist))
       for (line in uris.readLines()) {
-        URI uri = new URI(line)
-        dependencies.add(uri.getPath())
+        String path = getFilePath(new URI(line))
+        if (path != null) {
+          dependencies.add(path)
+        }
       }
+
     } catch (Exception ex) {
       show("Failed to read dependencies from ${sourceFile}: ${ex.getMessage()}")
       dependencies.add(sourceFile)
