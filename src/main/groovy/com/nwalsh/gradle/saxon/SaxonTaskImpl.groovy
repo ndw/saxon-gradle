@@ -59,7 +59,7 @@ class SaxonTaskImpl {
   }
 
   protected SaxonTaskImpl(DefaultTask task) {
-    self(task, false)
+    this(task, false)
   }
 
   protected SaxonTaskImpl(DefaultTask task, boolean isXQuery) {
