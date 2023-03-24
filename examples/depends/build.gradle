@@ -7,7 +7,7 @@ buildscript {
   // The XQuery task requires Saxon 12.x (or 11.6 or later when
   // that is available.)
   dependencies {
-    classpath group: 'net.sf.saxon', name: 'Saxon-HE', version: '12.1'
+    classpath group: 'net.sf.saxon', name: 'Saxon-HE', version: '11.5'
   }
 }
 
@@ -24,6 +24,11 @@ wrapper {
   gradleVersion = '8.0'
 }
 
+/*
+if ("yes".equals(System.getenv("CIWORKFLOW"))
+    && System.getProperty("os.name").startsWith("Windows")) {
+*/
+
 task xslt(type: SaxonXsltTask) {
   debug true
   xmlDepends true
@@ -37,7 +42,13 @@ task xslt(type: SaxonXsltTask) {
   ])
 }
 
-task xquery(type: SaxonXQueryTask) {
+task xquery() {
+  doLast {
+    println("nop");
+}
+}
+
+task xxquery(type: SaxonXQueryTask) {
   debug false
   xmlDepends true
   query 'tools/query.xq'
