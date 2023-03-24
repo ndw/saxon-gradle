@@ -364,8 +364,26 @@ class SaxonTaskImpl {
     return "file:///" + path
   }
 
+  private String getFilePath(URI uri) {
+    if (uri.getScheme() != "file") {
+      return null
+    }
+    String path = uri.getPath()
+    if (IS_WINDOWS && path.startsWith("/")) {
+      String filepart = path.substring(1)
+      Matcher match = WINDOWS_FILENAME.matcher(filepart)
+      if (match.find()) {
+        return filepart;
+      }
+    }
+    return path
+  }
+
   @SuppressWarnings('CatchException')
-  private List<String> findDependsOn(String prefix, Object dependSetting, String defaultStylesheet, String sourceFile) {
+  private List<String> findDependsOn(String prefix,
+                                     Object dependSetting,
+                                     String defaultStylesheet,
+                                     String sourceFile) {
     def dependencies = new ArrayList<String>()
 
     if (dependSetting instanceof Boolean && !dependSetting) {
@@ -404,8 +422,11 @@ class SaxonTaskImpl {
 
       BufferedInputStream uris = new BufferedInputStream(new FileInputStream(urilist))
       for (line in uris.readLines()) {
-        URI uri = new URI(line)
-        dependencies.add(uri.getPath())
+        String path = getFilePath(new URI(line))
+        if (path != null) {
+          println("URI: ${path}")
+          dependencies.add(path)
+        }
       }
     } catch (Exception ex) {
       show("Failed to read dependencies from ${sourceFile}: ${ex.getMessage()}")
