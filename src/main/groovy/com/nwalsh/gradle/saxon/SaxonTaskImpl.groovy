@@ -18,6 +18,7 @@ import org.gradle.internal.os.OperatingSystem;
 class SaxonTaskImpl {
   protected static final String QUIT = '-quit:off'
   protected static final String SPACE = ' '
+  protected static final String SLASH = '/'
   protected static final String FILE_SCHEME = 'file'
   protected static final String USE_URIS_OPTION = '-u'
 
@@ -357,7 +358,7 @@ class SaxonTaskImpl {
   }
 
   private String fixWindowsPath(String path) {
-    return path.replace("\\", "/").replace("+", "%2B").replace(SPACE, "%20")
+    return path.replace("\\", SLASH).replace("+", "%2B").replace(SPACE, "%20")
   }
 
   private String makeFileURI(String path) {
@@ -365,11 +366,11 @@ class SaxonTaskImpl {
   }
 
   private String getFilePath(URI uri) {
-    if (uri.getScheme() != "file") {
+    if (uri.getScheme() != FILE_SCHEME) {
       return null
     }
     String path = uri.getPath()
-    if (IS_WINDOWS && path.startsWith("/")) {
+    if (IS_WINDOWS && path.startsWith(SLASH)) {
       String filepart = path.substring(1)
       Matcher match = WINDOWS_FILENAME.matcher(filepart)
       if (match.find()) {
