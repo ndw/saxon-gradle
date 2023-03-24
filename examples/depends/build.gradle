@@ -7,7 +7,7 @@ buildscript {
   // The XQuery task requires Saxon 12.x (or 11.6 or later when
   // that is available.)
   dependencies {
-    classpath group: 'net.sf.saxon', name: 'Saxon-HE', version: '11.5'
+    classpath group: 'net.sf.saxon', name: 'Saxon-HE', version: '12.1'
   }
 }
 
@@ -42,14 +42,14 @@ task xslt(type: SaxonXsltTask) {
   ])
 }
 
-task xquery() {
+task xxquery() {
   doLast {
     println("nop");
-}
+  }
 }
 
-task xxquery(type: SaxonXQueryTask) {
-  debug false
+task xquery(type: SaxonXQueryTask) {
+  debug true
   xmlDepends true
   query 'tools/query.xq'
   input 'xml/input-1.xml'

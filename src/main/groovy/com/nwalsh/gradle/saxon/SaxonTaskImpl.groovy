@@ -62,7 +62,7 @@ class SaxonTaskImpl {
     this(task, false)
   }
 
-  protected SaxonTaskImpl(DefaultTask task, boolean isXQuery) {
+  protected SaxonTaskImpl(DefaultTask task, Boolean isXQuery) {
     this.task = task
     File cwd = new File(CWD)
     theBaseURI = cwd.toURI()

@@ -5,7 +5,7 @@ import org.gradle.api.GradleException
 
 class SaxonXQueryImpl extends SaxonTaskImpl {
   SaxonXQueryImpl(DefaultTask task) {
-    super(task)
+    super(task, true)
     mainClassName = 'net.sf.saxon.Query'
     taskType = 'XQuery'
   }

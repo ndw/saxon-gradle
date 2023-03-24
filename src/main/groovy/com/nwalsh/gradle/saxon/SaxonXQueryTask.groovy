@@ -17,7 +17,7 @@ import org.gradle.api.tasks.TaskAction
  * able to find it.</p>
  */
 class SaxonXQueryTask extends DefaultTask implements SaxonXQuery {
-  private final SaxonXQueryImpl impl = new SaxonXQueryImpl(this, true)
+  private final SaxonXQueryImpl impl = new SaxonXQueryImpl(this)
   protected List<String> cachedXml = null
 
   SaxonXQueryTask() {
