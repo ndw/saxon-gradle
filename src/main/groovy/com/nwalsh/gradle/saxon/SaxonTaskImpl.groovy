@@ -425,7 +425,6 @@ class SaxonTaskImpl {
       for (line in uris.readLines()) {
         String path = getFilePath(new URI(line))
         if (path != null) {
-          println("URI: ${path}")
           dependencies.add(path)
         }
       }
