@@ -48,7 +48,7 @@ class SaxonXsltImpl extends SaxonTaskImpl {
         println("Transform ${cmdline.join(SPACE)}")
       }
       cmdline.add(0, QUIT)
-      invoke(mainClassName, cmdline)
+      println("invoke(mainClassName, cmdline)")
     }
   }
 }
