@@ -20,3 +20,15 @@ jobs:
     - uses: eskatos/gradle-command-action@v1
       with:
         arguments: check -x groovydoc
+    - name: Test simple
+      working-directory: examples/simple
+      run: |
+        ./gradlew xslt xquery
+    - name: Test jexec
+      working-directory: examples/jexec
+      run: |
+        ./gradlew xslt xquery
+    - name: Test depends
+      working-directory: examples/depends
+      run: |
+        ./gradlew xslt xquery
