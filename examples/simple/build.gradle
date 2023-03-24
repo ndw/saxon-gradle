@@ -37,6 +37,7 @@ task xslt(type: SaxonXsltTask) {
 }
 
 task xquery(type: SaxonXQueryTask) {
+  debug true
   query 'tools/query.xq'
   input 'xml/input-1.xml'
   output "${buildDir}/output-2.xml"
