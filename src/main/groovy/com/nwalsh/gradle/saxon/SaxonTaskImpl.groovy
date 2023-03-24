@@ -59,9 +59,14 @@ class SaxonTaskImpl {
   }
 
   protected SaxonTaskImpl(DefaultTask task) {
+    self(task, false)
+  }
+
+  protected SaxonTaskImpl(DefaultTask task, boolean isXQuery) {
     this.task = task
     File cwd = new File(CWD)
     theBaseURI = cwd.toURI()
+    useURIs = IS_WINDOWS && !isXQuery;
   }
 
   // ============================================================
@@ -346,7 +351,7 @@ class SaxonTaskImpl {
       if (match.find()) {
         // Attempt to work around https://saxonica.plan.io/issues/5939
         String cwd = fixWindowsPath(CWD)
-        if (cwd.substring(0,3) == path.substring(0,3)) {
+        if (!useURIs && cwd.substring(0,3) == path.substring(0,3)) {
           return path.substring(2)
         }
         useURIs = true
