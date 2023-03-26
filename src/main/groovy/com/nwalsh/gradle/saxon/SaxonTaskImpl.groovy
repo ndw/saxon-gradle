@@ -161,6 +161,7 @@ class SaxonTaskImpl {
     // Attempt to avoid weird side effects from pass by reference
     parameters.collect { name, value ->
       stylesheetParameters[name] = value
+      show("Par: ${name} = ${value}")
     }
   }
 
