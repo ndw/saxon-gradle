@@ -24,6 +24,20 @@ wrapper {
   gradleVersion = '8.0'
 }
 
+def xsltOptions = [
+  'debug': true,
+  'parameters': [
+    "title": "spoon",
+    "padding": "1em"
+  ]]
+
+def queryOptions = [
+  'debug': true,
+  'query': 'tools/query.xq',
+  'parameters': [
+    'multiplier': 7
+  ]]
+  
 task xslt(type: SaxonXsltTask) {
   // Use URIs, just to show a simple arg
   stylesheet file("${projectDir}/tools/html5.xsl")
@@ -34,6 +48,13 @@ task xslt(type: SaxonXsltTask) {
     "title": "spoon",
     "padding": "1em"
   ])
+}
+
+task xslt_with_options(type: SaxonXsltTask) {
+  stylesheet file("${projectDir}/tools/html5.xsl")
+  input "file://${projectDir}/xml/input-1.xml"
+  output "file://${buildDir}/output-1.xml"
+  options(xsltOptions)
 }
 
 if ("yes".equals(System.getenv("CIWORKFLOW"))
@@ -51,5 +72,11 @@ if ("yes".equals(System.getenv("CIWORKFLOW"))
     parameters([
       'multiplier': 7
     ])
+  }
+
+  task xquery_with_options(type: SaxonXQueryTask) {
+    input 'xml/input-1.xml'
+    output "${buildDir}/output-2.xml"
+    options queryOptions
   }
 }

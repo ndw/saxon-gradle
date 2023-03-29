@@ -89,7 +89,10 @@ This project has many of the same benefits as the original:
 
 ## Options
 
-Options are specified with methods on the task. 
+Options are specified with methods on the task. In addition to the
+individual options, each task has an `options` option that accepts a
+map of option-name/value pairs. This is a convenient way to share
+options across several tasks.
 
 ### Saxon options
 

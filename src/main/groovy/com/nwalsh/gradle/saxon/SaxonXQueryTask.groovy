@@ -93,6 +93,67 @@ class SaxonXQueryTask extends DefaultTask implements SaxonXQuery {
     impl.queryString(xq)
   }
 
+  void options(Map optmap) {
+    optmap.each { entry ->
+      switch (entry.key) {
+        case 'input':
+          input(entry.value)
+          break
+        case 'output':
+          output(entry.value)
+          break
+        case 'query':
+          query(entry.value)
+          break
+        case 'queryString':
+          queryString(entry.value)
+          break
+        case 'javaArg':
+          javaArg(entry.value)
+          break
+        case 'javaArgs':
+          javaArgs(entry.value)
+          break
+        case 'workingDir':
+          workingDir(entry.value)
+          break
+        case 'env':
+          env(entry.value)
+          break
+        case 'classpath':
+          classpath(entry.value)
+          break
+        case 'exec':
+          exec(entry.value)
+          break
+        case 'mainClass':
+          mainClass(entry.value)
+          break
+        case 'arg':
+          arg(entry.value)
+          break
+        case 'args':
+          args(entry.value)
+          break
+        case 'xmlDepends':
+          xmlDepends(entry.value)
+          break
+        case 'parameters':
+          parameters(entry.value)
+          break
+        case 'debug':
+          debug(entry.value)
+          break
+        case 'baseURI':
+          baseURI(entry.value)
+          break
+        default:
+          show("Unknown option name; ignored: ${entry.key}")
+          break
+      }
+    }
+  }
+
   @InputFiles
   @SkipWhenEmpty
   FileCollection getInputFiles() {
