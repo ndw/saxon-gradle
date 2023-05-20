@@ -24,6 +24,8 @@ wrapper {
   gradleVersion = '8.0'
 }
 
+defaultTasks = ["xslt", "xslt_with_options", "xquery", "xquery_with_options"]
+
 def xsltOptions = [
   'debug': true,
   'parameters': [
@@ -65,7 +67,6 @@ if ("yes".equals(System.getenv("CIWORKFLOW"))
   }
 } else {
   task xquery(type: SaxonXQueryTask) {
-    debug true
     query 'tools/query.xq'
     input 'xml/input-1.xml'
     output "${buildDir}/output-2.xml"

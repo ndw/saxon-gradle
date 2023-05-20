@@ -24,6 +24,8 @@ wrapper {
   gradleVersion = '8.0'
 }
 
+defaultTasks = ["xslt", "xquery"]
+
 task xslt(type: SaxonXsltTask) {
   debug true
   xmlDepends true
