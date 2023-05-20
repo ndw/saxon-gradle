@@ -268,7 +268,11 @@ class SaxonTaskImpl {
     }
 
     if (uri.getScheme() == FILE_SCHEME) {
-      return new File(uri.getPath())
+      // Make sure the path is absolute; this will add the drive letter
+      // back onto Windows paths if necessary. That assures that they'll
+      // be processed correctly by getInputs and Saxon
+      File f = new File(uri.getPath())
+      return new File(f.getAbsolutePath())
     }
 
     useURIs = true
@@ -282,7 +286,11 @@ class SaxonTaskImpl {
 
     if (input instanceof URI) {
       if (input.getScheme() == FILE_SCHEME) {
-        return new File(input)
+        // Make sure the path is absolute; this will add the drive letter
+        // back onto Windows paths if necessary. That assures that they'll
+        // be processed correctly by getInputs and Saxon
+        File f = new File(input.getPath())
+        return new File(f.getAbsolutePath())
       }
     }
 
