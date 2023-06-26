@@ -69,6 +69,10 @@ class SaxonXsltTask extends DefaultTask implements SaxonXslt {
     impl.output(output)
   }
 
+  void export(Object export) {
+    impl.export(export)
+  }
+
   void parameters(Map<String, String> parameters) {
     impl.parameters(parameters)
   }
@@ -194,6 +198,10 @@ class SaxonXsltTask extends DefaultTask implements SaxonXslt {
     File outputFile = impl.resolveFile(impl.getOutput())
     if (outputFile != null) {
       files += project.files(outputFile)
+    }
+    File exportFile = impl.resolveFile(impl.getExport())
+    if (exportFile != null) {
+      files += project.files(exportFile)
     }
     return files
   }
