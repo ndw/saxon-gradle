@@ -57,8 +57,9 @@ interface Saxon {
   /**
    * Add the argument to the XSLT or XQuery invocation.
    *
-   * <p>You <em>should not</em> set the <code>-s:</code>, <code>-xsl:</code>, <code>-q:</code>,
-   * or <code>-o:</code> options this way!
+   * <p>You <em>must not</em> attempt to set the <code>-s:</code>, <code>-xsl:</code>,
+   * <code>-q:</code>, <code>-qs:</code>, <code>-o:</code>, or <code>-export:</code>
+   * options this way!
    *
    * @param arg The argument and its value, if appropriate
    */
@@ -67,8 +68,9 @@ interface Saxon {
   /**
    * Add the arguments to the XSLT or XQuery invocation.
    *
-   * <p>You <em>should not</em> set the <code>-s:</code>, <code>-xsl:</code>, <code>-q:</code>,
-   * or <code>-o:</code> options this way!
+   * <p>You <em>must not</em> attempt to set the <code>-s:</code>, <code>-xsl:</code>,
+   * <code>-q:</code>, <code>-qs:</code>, <code>-o:</code>, or <code>-export:</code>
+   * options this way!
    *
    * @param args The arguments and their values, if appropriate
    */

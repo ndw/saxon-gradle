@@ -12,6 +12,13 @@ interface SaxonXslt extends Saxon {
   void stylesheet(Object stylesheet)
 
   /**
+   * Set the export file.
+   *
+   * @param export The export file
+   */
+  void export(Object export)
+
+  /**
    * Parse the stylesheet for dependencies?
    *
    * <p>If this value is <code>true</code>, then the stylesheet will be parsed for xsl:import and xsl:include elements.

@@ -29,6 +29,14 @@ class SaxonTaskImpl {
   protected static final Pattern WINDOWS_FILENAME
     = Pattern.compile('^[A-Za-z]:.*$')
 
+  protected static final Map<String,String> INVALID_ARGS = [
+    '-s:': 'IGNORED: do not use arg/args for -s:, use source',
+    '-xsl:': 'IGNORED: do not use arg/args for -xsl:, use stylesheet',
+    '-o:': 'IGNORED: do not use arg/args for -o:, use output',
+    '-export:': 'IGNORED: do not use arg/args for -export:, use export',
+    '-q:': 'IGNORED: do not use arg/args for -q:, use query',
+    '-qs:': 'IGNORED: do not use arg/args for -qs:, use queryString']
+
   protected final List<String> javaOptions = []
   protected final List<String> saxonOptions = []
 
@@ -43,6 +51,7 @@ class SaxonTaskImpl {
   protected Object inputFile = null
   protected Object outputFile = null
   protected Object stylesheetFile = null
+  protected Object exportFile = null
   protected Object xqueryFile = null
   protected Object xqueryString = null
   protected Boolean useURIs = false
@@ -124,6 +133,13 @@ class SaxonTaskImpl {
   }
 
   void arg(String arg) {
+    for (name in INVALID_ARGS.keySet()) {
+      if (arg.startsWith(name)) {
+        println(INVALID_ARGS.get(name));
+        return;
+      }
+    }
+
     show("Arg: ${arg}")
     saxonOptions.add(arg)
   }
@@ -155,6 +171,19 @@ class SaxonTaskImpl {
       }
     }
     show("Out: ${this.output}")
+  }
+
+  void export(Object export) {
+    exportFile = resolveResource(export)
+    // The export location must be a File, not a URI
+    if (exportFile instanceof URI) {
+      if (exportFile.getScheme() == FILE_SCHEME) {
+        exportFile = new File(outputFile.getPath())
+      } else {
+        throw new GradleException("Export must be a file.")
+      }
+    }
+    show("Exp: ${this.export}")
   }
 
   void parameters(Map<String, String> parameters) {
@@ -196,6 +225,10 @@ class SaxonTaskImpl {
 
   Object getOutput() {
     return outputFile
+  }
+
+  Object getExport() {
+    return exportFile
   }
 
   // ============================================================
@@ -322,6 +355,9 @@ class SaxonTaskImpl {
     }
     if (outputFile != null) {
       parameters.add("-o:${output}")
+    }
+    if (exportFile != null) {
+      parameters.add("-export:${export}")
     }
 
     if (useURIs) {
