@@ -5,11 +5,8 @@ plugins {
   id 'com.gradle.plugin-publish' version '1.1.0'
 }
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
-
 wrapper {
-  gradleVersion = '8.0'
+  gradleVersion = '8.2.1'
 }
 
 repositories {
@@ -18,6 +15,12 @@ repositories {
 
 dependencies {
   implementation gradleApi()
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(8)
+  }
 }
 
 test {
